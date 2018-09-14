@@ -22,7 +22,7 @@ private:
 	Json pars_obj(std::istringstream& stream);
 
 public:
-	Json() { My_type = null; };
+	Json() { My_type = null; }
 	// Конструктор из строки, содержащей Json-данные.
 	Json(const std::string& s);
 
