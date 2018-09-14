@@ -1,9 +1,10 @@
 #include <any>
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include <string>
 #include <unordered_map>
+#include <sstream>
+
 
 class Json
 {
@@ -12,7 +13,7 @@ private:
 	std::vector<std::any> array;
 
 	enum type {Object, Array, null};
-	enum Lit {True, False, Null};
+	
 	type flag = null;
 
 	void find_key(std::istringstream& stream, std::string& key);
@@ -155,7 +156,7 @@ void Json::find_value(std::istringstream& stream, std::any& value, bool& flag)
 			end.push_back(c);
 		}
 		if (end == "ull")
-			value = Null;
+			value = null;
 		else
 			throw "Error_input";
 		if (c == '}' || c == ']')
@@ -276,7 +277,6 @@ Json::Json(const std::string& s)
 		parse(s);
 };
 
-
 Json Json::parseFile(const std::string& path_to_file)
 {
 	std::ifstream file(path_to_file);
@@ -348,5 +348,3 @@ const std::any& Json::operator[](int index) const
 {
 	return array.at(index);
 };
-
-
