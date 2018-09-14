@@ -74,7 +74,7 @@ Json Json::pars_obj(std::istringstream& stream)
 		MyJ.map.insert(std::pair(key, value));
 	}
 	return MyJ;
-};
+}
 
 std::vector<std::any> Json::parse_input_arr(std::istringstream& stream)
 {
@@ -88,7 +88,7 @@ std::vector<std::any> Json::parse_input_arr(std::istringstream& stream)
 		value.reset();
 	}
 	return array;
-};
+}
 
 void Json::find_key(std::istringstream& stream, std::string& key)
 {
@@ -101,7 +101,7 @@ void Json::find_key(std::istringstream& stream, std::string& key)
 		else
 			key.push_back(c);
 	}
-};
+}
 
 void Json::find_value(std::istringstream& stream, std::any& value, bool& flag)
 {
@@ -259,7 +259,7 @@ void Json::find_value(std::istringstream& stream, std::any& value, bool& flag)
 		break;
 	}
 	}
-};
+}
 
 Json::Json(const std::string& s)
 {
@@ -275,7 +275,7 @@ Json::Json(const std::string& s)
 
 	else
 		parse(s);
-};
+}
 
 Json Json::parseFile(const std::string& path_to_file)
 {
@@ -288,7 +288,7 @@ Json Json::parseFile(const std::string& path_to_file)
 		file.close();
 		return parse(data);
 	}
-};
+}
 
 Json Json::parse(const std::string& s)
 {
@@ -315,13 +315,13 @@ Json Json::parse(const std::string& s)
 		throw std::logic_error("Error input");
 		break;
 	}
-};
+}
 
 bool Json::is_array() const
 {
 	if (My_type == Array) return true;
 	return false;
-};
+}
 
 bool Json::is_object() const
 {
@@ -329,7 +329,7 @@ bool Json::is_object() const
 		return true;
 	else 
 		return false;
-};
+}
 
 bool Json::is_null() const
 {
@@ -337,16 +337,16 @@ bool Json::is_null() const
 		return true;
 	else 
 		return false;
-};
+}
 
 const std::any& Json::operator[](const std::string& key) const
 {
 	return map.at(key);
-};
+}
 
 const std::any& Json::operator[](int index) const
 {
 	return array.at(index);
-};
+}
 
 
