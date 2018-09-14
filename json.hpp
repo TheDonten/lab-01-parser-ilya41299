@@ -303,8 +303,9 @@ Json Json::parse(const std::string& s)
 	case ('{'):
 	{
 		Json obj;
-		obj.My_type = Object;
+		
 		obj = obj.pars_obj(stream);
+		obj.My_type = Object;
 		return obj;
 	}
 	case ('['):
@@ -351,3 +352,4 @@ const std::any& Json::operator[](int index) const
 {
 	return array.at(index);
 }
+
