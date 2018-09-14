@@ -14,33 +14,38 @@ private:
 	std::unordered_map<std::string, std::any> map;
 	std::vector<std::any> array;
 
+	enum type {Object, Array, null};
+	enum Lit {True, False, Null};
+	type flag = null;
+
 	void find_key(std::istringstream& stream, std::string& key);
 	void find_value(std::istringstream& stream, std::any& value, bool& flag);
 	std::vector<std::any> parse_input_arr(std::istringstream& stream);
 	Json pars_obj(std::istringstream& stream);
 
 public:
-	Json() {};
+	Json() { flag = null; };
 	// Конструктор из строки, содержащей Json-данные.
 	Json(const std::string& s);
 
 	// Метод возвращает true, если данный экземпляр содержит в себе JSON-массив. Иначе false.
 	bool is_array() const;
+
 	// Метод возвращает true, если данный экземпляр содержит в себе JSON-объект. Иначе false.
 	bool is_object() const;
 
+	// Метод возвращает true, если данный экземпляр не содержит ничего, т.е. null. Иначе false.
+	bool is_null() const;
+
 	// Метод возвращает значение по ключу key, если экземпляр является JSON-объектом.
-	// Значение может иметь один из следующих типов: Json, std::string, double, bool или быть
-	// пустым.
+	// Значение может иметь один из следующих типов: Json, std::string, double, bool или быть пустым.
 	// Если экземпляр является JSON-массивом, генерируется исключение.
-	std::any& operator[](const std::string& key);
+	const std::any& operator[](const std::string& key) const;
 
 	// Метод возвращает значение по индексу index, если экземпляр является JSON-массивом.
-	// Значение может иметь один из следующих типов: Json, std::string, double, bool или быть
-	// пустым.
+	// Значение может иметь один из следующих типов: Json, std::string, double, bool или быть пустым.
 	// Если экземпляр является JSON-объектом, генерируется исключение.
-	std::any& operator[](int index);
-
+	const std::any& operator[](int index) const;
 	// Метод возвращает объект класса Json из строки, содержащей Json-данные.
 	static Json parse(const std::string& s);
 
@@ -75,7 +80,6 @@ Json Json::pars_obj(std::istringstream& stream)
 
 std::vector<std::any> Json::parse_input_arr(std::istringstream& stream)
 {
-	char c;
 	std::any value;
 	std::vector<std::any> v;
 	bool flag = true;
@@ -110,7 +114,6 @@ void Json::find_value(std::istringstream& stream, std::any& value, bool& flag)
 	std::string end;
 	switch (c)
 	{
-
 	case 'f':
 	{
 		while (stream >> c && (c != ',' && c != '}' && c != ']'))
@@ -155,7 +158,7 @@ void Json::find_value(std::istringstream& stream, std::any& value, bool& flag)
 			end.push_back(c);
 		}
 		if (end == "ull")
-			value = std::nullopt;
+			value = Null;
 		else
 			throw "Error_input";
 		if (c == '}' || c == ']')
@@ -198,6 +201,7 @@ void Json::find_value(std::istringstream& stream, std::any& value, bool& flag)
 			else if (c != ',')
 				throw "Error_input";
 		}
+		arr.flag = Array;
 		break;
 	}
 	case '{':
@@ -206,6 +210,7 @@ void Json::find_value(std::istringstream& stream, std::any& value, bool& flag)
 		Json new_obj;
 		new_obj.pars_obj(stream);
 		value = new_obj;
+		new_obj.flag = Object;
 		break;
 	}
 	default:
@@ -298,17 +303,53 @@ Json Json::parse(const std::string& s)
 	case ('{'):
 	{
 		Json obj;
-		return obj.pars_obj(stream);
+		obj.flag = Object;
+		obj=obj.pars_obj(stream);
+		return obj;
 	}
 	case ('['):
 	{
-		Json ar;
-		ar.array = ar.parse_input_arr(stream);
-		return ar;
+		Json arr;
+		arr.flag = Array;
+		arr.array = arr.parse_input_arr(stream);
+		return arr;
 	}
 	default:
 		throw std::logic_error("Error input");
 		break;
 	}
 };
+
+bool Json::is_array() const
+{
+	if (flag == Array) return true;
+	return false;
+};
+
+bool Json::is_object() const
+{
+	if (flag == Object) 
+		return true;
+	else 
+		return false;
+};
+
+bool Json::is_null() const
+{
+	if (flag == null) 
+		return true;
+	else 
+		return false;
+};
+
+const std::any& Json::operator[](const std::string& key) const
+{
+	return map.at(key);
+};
+
+const std::any& Json::operator[](int index) const
+{
+	return array.at(index);
+};
+
 
