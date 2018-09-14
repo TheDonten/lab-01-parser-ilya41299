@@ -1,5 +1,3 @@
-
-#include "stdafx.h"
 #include <any>
 #include <iostream>
 #include <fstream>
@@ -13,28 +11,45 @@
 
 class Json {
 private:	
-	std::unordered_map <std::string, std::any> Mymap;
-	
-	static void find_key(std::istringstream &stream, std::string& key)
+	std::unordered_map <std::string, std::any> map;
+	std::vector<std::any> array;
+
+	 void find_key(std::istringstream &stream)
 	{
 		char c;
 		if (!(stream >> c && c != '"')) throw "Error_input";
 		while (stream >> c && c != '"')
 		{
 			if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')))
-				throw "Error_input";
+				throw std::logic_error("Error input");
 			else key.push_back(c);
 		}
 	};
 
-	static void pars_obj(std::istringstream& stream) 
+	 Json pars_arr(std::istringstream& stream) 
+	 {
+
+	 };
+
+	 Json pars_obj(std::istringstream& stream) 
 	{
-		std::string key;
-		std::any value;
 		char c;
-		
+		stream >> c;
+		if(c!='"') std::logic_error("Error input");
+		else 
+		{
+			bool flag = true;
+			Json MyJ;
+			while (flag)
+			{
+				MyJ.map.insert(std::pair(find_key(stream), find_value(stream));
+			}
+		}
+		/*
+		find_key(stream, key);
+
 		if (stream>>c && c!=':')
-			throw "Error_input";
+			throw std::logic_error("Error input");
 		if (stream >> c)
 		{
 			std::string end;
@@ -102,10 +117,10 @@ private:
 
 			}
 			
-		}
+		}*/
 	};
 public:
-  
+	Json() {};
 	// Конструктор из строки, содержащей Json-данные.
 	Json(const std::string& s);
 
@@ -149,34 +164,41 @@ Json::Json(const std::string& s)
  Json Json::parseFile(const std::string& path_to_file) 
  {
 	 if (std::filesystem::exists(path_to_file) == false)	//проверка на существование файла с данным именем
-		 throw("Error 404");
-	 
-	 std::ifstream file(path_to_file);
+		 throw std::logic_error("Error input");
+	 else 
+	 {
+		 std::ifstream file(path_to_file);
+		 std::string data((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
-	 std::string data((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+		 return parse(data);
+		
+	 }
 	 
-	 std::istringstream stream(data);
-	 char c;
-	 stream >> c;
+	
 	 
-	 switch (c)
-	 {
-	 case '{': 
-	 {
-		 pars_obj(stream);
-	 }
-	 case '[':
-	 {
-		 pars_mas(stream);
-	 }
-	 default: throw "Error_input";
-		 break;
-	 }
  };
 
  Json Json::parse(const std::string& s)
  {
-	
+	 std::istringstream stream(s);
+	 char c;
+	 stream >> c;
+	 switch (c)
+	 {
+	 case('{'):
+	 {
+		 return pars_obj(stream);
+		 break;
+	 }
+	 case('['):
+	 {
+		 return parse_arr(stream);
+		 break;
+	 }
+	 default:
+		 throw std::logic_error("Error input");
+		 break;
+	 }
  };
 
 std::optional<std::string> read_data(const std::string & filename) 
