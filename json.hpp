@@ -14,7 +14,7 @@ private:
 
 	enum type {Object, Array, null};
 	
-	type flag = null;
+	type My_type = null;
 
 	void find_key(std::istringstream& stream, std::string& key);
 	void find_value(std::istringstream& stream, std::any& value, bool& flag);
@@ -22,7 +22,7 @@ private:
 	Json pars_obj(std::istringstream& stream);
 
 public:
-	Json() { flag = null; };
+	Json() { My_type = null; };
 	// Конструктор из строки, содержащей Json-данные.
 	Json(const std::string& s);
 
@@ -199,7 +199,7 @@ void Json::find_value(std::istringstream& stream, std::any& value, bool& flag)
 			else if (c != ',')
 				throw "Error_input";
 		}
-		arr.flag = Array;
+		arr.My_type = Array;
 		break;
 	}
 	case '{':
@@ -208,7 +208,7 @@ void Json::find_value(std::istringstream& stream, std::any& value, bool& flag)
 		Json new_obj;
 		new_obj.pars_obj(stream);
 		value = new_obj;
-		new_obj.flag = Object;
+		new_obj.My_type = Object;
 		break;
 	}
 	default:
@@ -300,14 +300,14 @@ Json Json::parse(const std::string& s)
 	case ('{'):
 	{
 		Json obj;
-		obj.flag = Object;
+		obj.My_type = Object;
 		obj=obj.pars_obj(stream);
 		return obj;
 	}
 	case ('['):
 	{
 		Json arr;
-		arr.flag = Array;
+		arr.My_type = Array;
 		arr.array = arr.parse_input_arr(stream);
 		return arr;
 	}
@@ -319,13 +319,13 @@ Json Json::parse(const std::string& s)
 
 bool Json::is_array() const
 {
-	if (flag == Array) return true;
+	if (My_type == Array) return true;
 	return false;
 };
 
 bool Json::is_object() const
 {
-	if (flag == Object) 
+	if (My_type == Object)
 		return true;
 	else 
 		return false;
@@ -333,7 +333,7 @@ bool Json::is_object() const
 
 bool Json::is_null() const
 {
-	if (flag == null) 
+	if (My_type == null)
 		return true;
 	else 
 		return false;
@@ -348,3 +348,5 @@ const std::any& Json::operator[](int index) const
 {
 	return array.at(index);
 };
+
+
