@@ -279,16 +279,16 @@ Json::Json(const std::string& s)
 		parse(s);
 };
 
+
 Json Json::parseFile(const std::string& path_to_file)
 {
-	if (std::filesystem::exists(path_to_file)
-		== false) //проверка на существование файла с данным именем
+	std::ifstream file(path_to_file);
+	if (!file.is_open())
 		throw std::logic_error("Error input");
 	else
 	{
-		std::ifstream file(path_to_file);
 		std::string data((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-
+		file.close();
 		return parse(data);
 	}
 };
