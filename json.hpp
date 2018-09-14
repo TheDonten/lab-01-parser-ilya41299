@@ -17,7 +17,7 @@ private:
 	 void find_key(std::istringstream &stream, std::string &key)
 	{
 		char c;
-		if (!(stream >> c && c != '"')) throw "Error_input";
+		
 		while (stream >> c && c != '"')
 		{
 			if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')))
@@ -37,7 +37,7 @@ private:
 
 			 case 'f':
 			 {
-				 while (stream >> c && (c != ',' || c != '}' || c != ']'))
+				 while (stream >> c && (c != ',' && c != '}' && c != ']'))
 				 {
 					 end.push_back(c);
 				 }
@@ -47,6 +47,7 @@ private:
 				 {
 					 flag = false;
 				 }
+				 else if(c!=',')throw "Error_input";
 				 break;
 			 }
 			 case 't':
@@ -61,6 +62,7 @@ private:
 				 {
 					 flag = false;
 				 }
+				 else if (c != ',')throw "Error_input";
 				 break;
 			 }
 
@@ -76,34 +78,47 @@ private:
 				 {
 					 flag = false;
 				 }
+				 else if (c != ',')throw "Error_input";
 				 break;
 			 }
 
 			 case '"':
 			 {
-				 while (stream >> c && (c != ',' || c != '}' || c != ']'))
+				 while (stream >> c && c!='"')
 				 {
 					 if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')))
 						 throw "Error_input";
 					 else end.push_back(c);
 				 }
+
 				 value = end;
+				 stream >> c;
 				 if (c == '}' || c == ']')
 				 {
 					 flag = false;
 				 }
+				 else if (c != ',')throw "Error_input";
 				 break;
 			 }
 			 case '[':
 			 {
 				 Json arr;
-				 arr.pars_arr(stream);
+				 value = arr.parse_input_arr(stream);
+				 if (stream >> c) 
+				 {
+					 if (c == '}')
+						 flag = false;
+					 else if(c!=',') throw "Error_input";
+				 }
+				 break;
 
 			 }
 			 case '{':
 			 {
 				 //рекурсия
-				 pars_obj(stream);
+				 Json new_obj;
+				 new_obj.pars_obj(stream);
+				 value = new_obj;
 				 break;
 			 }
 			 default:
@@ -115,7 +130,7 @@ private:
 				 else throw "Error_input";
 				 bool is_double = false;
 
-				 while (stream >> c && (c != ',' || c != '}' || c != ']'))
+				 while (stream >> c && (c != ',' && c != '}' && c != ']'))
 				 {
 					 if (c == '.')
 					 {
@@ -127,7 +142,7 @@ private:
 						 }
 					 }
 					 else if (isdigit(c)) end.push_back(c);
-					 else throw "Error_input";
+					 
 				 }
 
 				 std::stringstream str_ch(end);
@@ -147,26 +162,49 @@ private:
 				 {
 					 flag = false;
 				 }
+				 else if(c!=',') throw "Error_input";
 				 break;
 			 }
-}};
+}
+};
 
-	 Json pars_arr(std::istringstream& stream) 
+
+std::vector<std::any> parse_input_arr(std::istringstream &stream)
 	 {
-
+			 char c;
+			 std::any value;
+			 std::vector<std::any> v;
+			 bool flag = true;
+			 while (flag)
+			 {
+				 find_value(stream, value, flag);
+				 /*if (!flag) 
+				 {
+					 if (!(stream >> c) || c == ',' && c == ']')
+						 flag = true;
+					 else throw std::out_of_range("Error");
+				 }*/
+				 v.push_back(value);
+				 value.reset();
+				 //if (c == ']') flag = false;
+			 }
+			 return array;
 	 };
 
 	 Json pars_obj(std::istringstream& stream) 
 	{
 		char c;
-		stream >> c;
-		if(c!='"') throw std::logic_error("Error input");
-		else 
-		{
+		
+
 			bool flag = true;
 			Json MyJ;
 			while (flag)
 			{
+				if (stream >> c && c != '"') 
+				{
+					if (c == '}')break;
+					else throw std::logic_error("Error input");
+				}
 				std::string key;
 				find_key(stream, key);
 				if((stream>>c && c==':')==false) throw std::logic_error("Error input");
@@ -175,16 +213,9 @@ private:
 				MyJ.map.insert(std::pair(key, value));
 			}
 			return MyJ;
-		}
-		/*
-		find_key(stream, key);
-
-		if (stream>>c && c!=':')
-			throw std::logic_error("Error input");
 		
-			
-		}*/
 	};
+
 public:
 	Json() {};
 	// Конструктор из строки, содержащей Json-данные.
@@ -239,9 +270,6 @@ Json::Json(const std::string& s)
 		 return parse(data);
 		
 	 }
-	 
-	
-	 
  };
 
  Json Json::parse(const std::string& s)
@@ -253,30 +281,17 @@ Json::Json(const std::string& s)
 	 {
 	 case('{'):
 	 {
-		 return pars_obj(stream);
-		 break;
+		 Json obj;
+		 return obj.pars_obj(stream);
 	 }
 	 case('['):
 	 {
-		 return parse_arr(stream);
-		 break;
+		 Json ar;
+		 ar.array = ar.parse_input_arr(stream);
+		 return ar;
 	 }
 	 default:
 		 throw std::logic_error("Error input");
 		 break;
 	 }
  };
-
-std::optional<std::string> read_data(const std::string & filename) 
-{
-	//Если файл не существует, возвращаем пустоту
-	//Иначе происходит чтение файла
-	if (std::filesystem::exists(filename) == false)
-		return std::nullopt;//не хранит данных
-
-	std::ifstream file(filename);
-
-	std::string data((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-
-	return data;
-}
