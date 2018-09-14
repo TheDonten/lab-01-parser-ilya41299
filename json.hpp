@@ -12,8 +12,8 @@ private:
 	std::unordered_map<std::string, std::any> map;
 	std::vector<std::any> array;
 
-	enum type {Object, Array, null};
-	
+	enum type { Object, Array, null };
+
 	type My_type = null;
 
 	void find_key(std::istringstream& stream, std::string& key);
@@ -269,12 +269,15 @@ Json::Json(const std::string& s)
 	{
 		name.push_back(s[s.size() - i]);
 	}
-
+	Json J;
 	if (name == "txt.")
-		parseFile(s);
-
+		J = parseFile(s);
 	else
-		parse(s);
+		J=parse(s);
+
+	this->array = J.array;
+	this->map = J.map;
+	this->My_type = J.My_type;
 }
 
 Json Json::parseFile(const std::string& path_to_file)
@@ -301,7 +304,7 @@ Json Json::parse(const std::string& s)
 	{
 		Json obj;
 		obj.My_type = Object;
-		obj=obj.pars_obj(stream);
+		obj = obj.pars_obj(stream);
 		return obj;
 	}
 	case ('['):
@@ -327,7 +330,7 @@ bool Json::is_object() const
 {
 	if (My_type == Object)
 		return true;
-	else 
+	else
 		return false;
 }
 
@@ -335,7 +338,7 @@ bool Json::is_null() const
 {
 	if (My_type == null)
 		return true;
-	else 
+	else
 		return false;
 }
 
@@ -348,5 +351,3 @@ const std::any& Json::operator[](int index) const
 {
 	return array.at(index);
 }
-
-
