@@ -191,9 +191,9 @@ void Json::find_value(std::istringstream& stream, std::any& value, bool& flag)
 	case '[':
 	{
 		Json My_arr;
-		//value = arr.parse_input_arr(stream);
+		
 		My_arr.array = My_arr.parse_input_arr(stream);
-		//value = parse_input_arr(stream);
+		
 		if (stream >> c)
 		{
 			if (c == '}')
@@ -209,9 +209,10 @@ void Json::find_value(std::istringstream& stream, std::any& value, bool& flag)
 	{
 		//рекурсия
 		Json new_obj;
-		new_obj.pars_obj(stream);
-		value = new_obj;
+		new_obj = pars_obj(stream);
 		new_obj.My_type = Object;
+
+		value = new_obj;
 		break;
 	}
 	default:
@@ -355,4 +356,6 @@ const std::any& Json::operator[](int index) const
 {
 	return array.at(index);
 }
+
+
 
