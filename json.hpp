@@ -87,7 +87,7 @@ std::vector<std::any> Json::parse_input_arr(std::istringstream& stream)
 		v.push_back(value);
 		value.reset();
 	}
-	return array;
+	return v;
 }
 
 void Json::find_key(std::istringstream& stream, std::string& key)
@@ -132,7 +132,7 @@ void Json::find_value(std::istringstream& stream, std::any& value, bool& flag)
 	}
 	case 't':
 	{
-		while (stream >> c && (c != ',' || c != '}' || c != ']'))
+		while (stream >> c && (c != ',' && c != '}' && c != ']'))
 		{
 			end.push_back(c);
 		}
@@ -190,8 +190,10 @@ void Json::find_value(std::istringstream& stream, std::any& value, bool& flag)
 	}
 	case '[':
 	{
-		Json arr;
-		value = arr.parse_input_arr(stream);
+		Json My_arr;
+		//value = arr.parse_input_arr(stream);
+		My_arr.array = My_arr.parse_input_arr(stream);
+		//value = parse_input_arr(stream);
 		if (stream >> c)
 		{
 			if (c == '}')
@@ -199,7 +201,8 @@ void Json::find_value(std::istringstream& stream, std::any& value, bool& flag)
 			else if (c != ',')
 				throw "Error_input";
 		}
-		arr.My_type = Array;
+		My_arr.My_type = Array;
+		value = My_arr;
 		break;
 	}
 	case '{':
@@ -273,7 +276,7 @@ Json::Json(const std::string& s)
 	if (name == "txt.")
 		J = parseFile(s);
 	else
-		J=parse(s);
+		J = parse(s);
 
 	this->array = J.array;
 	this->map = J.map;
@@ -303,7 +306,7 @@ Json Json::parse(const std::string& s)
 	case ('{'):
 	{
 		Json obj;
-		
+
 		obj = obj.pars_obj(stream);
 		obj.My_type = Object;
 		return obj;
