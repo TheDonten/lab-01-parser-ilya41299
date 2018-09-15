@@ -14,7 +14,7 @@ private:
 
 	enum type { Object, Array, null };
 
-	type My_type = null;
+	type My_type;
 
 	void find_key(std::istringstream& stream, std::string& key);
 	void find_value(std::istringstream& stream, std::any& value, bool& flag);
